@@ -35,6 +35,7 @@ namespace DAW
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DAW", Version = "v1" });
             });
 
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<DAWContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         }
 
