@@ -22,6 +22,7 @@ namespace DAW
 {
     public class Startup
     {
+        private string CorsAllowSpecificOrigin = "frontendAllowOrigin";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -33,7 +34,7 @@ namespace DAW
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DAW", Version = "v1" });
@@ -59,6 +60,18 @@ namespace DAW
             services.AddScoped<IJWT, JWT>();
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
+            services.AddCors(option =>
+            {
+                option.AddPolicy(name: CorsAllowSpecificOrigin,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                    });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,22 +80,34 @@ namespace DAW
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DAW v1"));
+            }
+            else
+            {
+                app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseMiddleware<JWTMiddleware>();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                endpoints.MapControllers();
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyApi");
+                c.RoutePrefix = string.Empty;
             });
+
+            app.Use(async (c, n) => {
+                c.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                await n.Invoke();
+            });
+
+
+            app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+
+            app.UseHttpsRedirection();
+            app.UseMiddleware<JWTMiddleware>();
+            app.UseMvc();
         }
     }
 }
