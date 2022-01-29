@@ -38,9 +38,9 @@ namespace DAW.Controllers
         }
 
         [HttpGet("detailsUser")]
-        public IActionResult getByNameWithData(string name)
+        public IActionResult getByNameWithDetails(string name)
         {
-            var result = _userService.getUserByNameWithDate(name);
+            var result = _userService.getUserByNameWithDetails(name);
             return Ok(result);
         }
 
