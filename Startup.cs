@@ -80,34 +80,22 @@ namespace DAW
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DAW v1"));
             }
-            else
-            {
-                app.UseHsts();
-            }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyApi");
-                c.RoutePrefix = string.Empty;
-            });
-
-            app.Use(async (c, n) => {
-                c.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                await n.Invoke();
-            });
-
-
-            app.UseCors(x => x
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
+
             app.UseMiddleware<JWTMiddleware>();
-            app.UseMvc();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }
