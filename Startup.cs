@@ -1,6 +1,8 @@
 using DAW.Data;
 using DAW.Repository.DatabaseRepository;
 using DAW.Services;
+using DAW.Utilities;
+using DAW.Utilities.JWT;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -37,7 +39,7 @@ namespace DAW
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DAW", Version = "v1" });
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<DAWContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // inregistram toate repository-urile si toate serviciile (pt dependency injection)
@@ -54,20 +56,8 @@ namespace DAW
             services.AddTransient<IShopService, ShopService>();
 
 
-            services.AddScoped<IJWTUtils, JWTUtils>();
+            services.AddScoped<IJWT, JWT>();
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
-
-            services.AddCors(option =>
-            {
-                option.AddPolicy(name: CorsAllowSpecificOrigin,
-                    builder =>
-                    {
-                        builder.WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                    });
-            });
 
         }
 
@@ -84,6 +74,8 @@ namespace DAW
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<JWTMiddleware>();
 
             app.UseAuthorization();
 

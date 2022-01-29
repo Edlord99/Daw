@@ -1,6 +1,7 @@
 ﻿using DAW.Models._1_1;
 using DAW.Models.Authentication;
 using DAW.Services;
+using DAW.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -45,7 +46,7 @@ namespace DAW.Controllers
             return Ok(result);
         }
 
-        //[Authorization(Rol.Admin)]
+        [Authorization(Role.Admin)]
         //[Authorization]
         [HttpGet("getAll")]
         public IActionResult getAllWithInclude()

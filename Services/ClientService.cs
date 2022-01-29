@@ -5,6 +5,7 @@ using DAW.Repository.DatabaseRepository;
 using System;
 using System.Collections.Generic;
 using DAW.Models.Authentication;
+using DAW.Utilities.JWT;
 
 namespace DAW.Services
 {
@@ -12,13 +13,13 @@ namespace DAW.Services
     {
         public IClientRepository _clientRepository;
         public IDetailsRepository _detailsRepository;
-        public IJWTUtils _ijwtUtils;
+        public IJWT _ijwt;
 
-        public ClientService(IClientRepository clientRepository, IDetailsRepository detailsRepository, IJWTUtils ijwtUtils)
+        public ClientService(IClientRepository clientRepository, IDetailsRepository detailsRepository, IJWT ijwt)
         {
             _clientRepository = clientRepository;
             _detailsRepository = detailsRepository;
-            _ijwtUtils = ijwtUtils;
+            _ijwt = ijwt;
         }
 
 
@@ -132,7 +133,7 @@ namespace DAW.Services
                 return null;
             }
             //generam un jwt token (jwt = json web token)
-            var token = _ijwtUtils.GenerateJWTToken(user);
+            var token = _ijwt.GenerateJWTToken(user);
             return new UserResponseDTO(user, token);
 
         }

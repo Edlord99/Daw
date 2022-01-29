@@ -5,12 +5,11 @@ using System.Threading.Tasks;
 
 namespace DAW.Models.Authentication
 {
-    public class Role
-    {
-        public enum Rol
+    
+        public enum Role
         {
             Admin,
             User
         }
-    }
+    
 }
