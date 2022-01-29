@@ -1,4 +1,6 @@
 using DAW.Data;
+using DAW.Repository.DatabaseRepository;
+using DAW.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -37,6 +39,36 @@ namespace DAW
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<DAWContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            // inregistram toate repository-urile si toate serviciile (pt dependency injection)
+            // transient: la fiecare injectare o instanta noua!
+            services.AddTransient<IClientRepository, ClientRepository>();
+            services.AddTransient<IDetailsRepository, DetailsRepository>();
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IShopRepository, ShopRepository>();
+
+
+            services.AddTransient<IClientService, ClientService>();
+            services.AddTransient<IDetailsService, DetailsService>();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IShopService, ShopService>();
+
+
+            services.AddScoped<IJWTUtils, JWTUtils>();
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
+            services.AddCors(option =>
+            {
+                option.AddPolicy(name: CorsAllowSpecificOrigin,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                    });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,6 @@
 ﻿using DAW.Models._1_1;
 using DAW.Models.Authentication;
+using DAW.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
@@ -15,17 +16,17 @@ namespace DAW.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IClientService _clientService;
 
-        public ClientController(IUserService userService)
+        public ClientController(IClientService clientService)
         {
-            _userService = userService;
+            _clientService = clientService;
         }
 
         [HttpGet]
         public IActionResult getByFullName(string name)
         {
-            var result = _userService.getUserByName(name);
+            var result = _clientService.getClientByName(name);
             return Ok(result);
         }
 
@@ -33,14 +34,14 @@ namespace DAW.Controllers
         public IActionResult getById([FromRoute] string id)
         {
             var guidID = new Guid(id);
-            var result = _userService.FindByIdWithData(guidID);
+            var result = _clientService.FindByIdWithDetails(guidID);
             return Ok(result);
         }
 
         [HttpGet("detailsUser")]
         public IActionResult getByNameWithDetails(string name)
         {
-            var result = _userService.getUserByNameWithDetails(name);
+            var result = _clientService.getClientByNameWithDetails(name);
             return Ok(result);
         }
 
@@ -49,14 +50,14 @@ namespace DAW.Controllers
         [HttpGet("getAll")]
         public IActionResult getAllWithInclude()
         {
-            var usersList = _userService.getAll();
+            var usersList = _clientService.getAll();
             return Ok(usersList);
         }
 
         [HttpPost]
         public IActionResult AddWithFromBody(Client user)
         {
-            var result = _userService.createUser(user);
+            var result = _clientService.createClient(user);
             return Ok(result);
         }
 
@@ -65,7 +66,7 @@ namespace DAW.Controllers
         {
             //var entity = VideoGames.FirstOrDefault(videoGame => videoGame.Id == id);
             Guid parsedId = new Guid(id);
-            Client userToUpdate = _userService.FindById(parsedId);
+            Client userToUpdate = _clientService.FindById(parsedId);
 
             if (userToUpdate == null)
             {
@@ -73,7 +74,7 @@ namespace DAW.Controllers
             }
 
             user.ApplyTo(userToUpdate, ModelState); // Must have Microsoft.AspNetCore.Mvc.NewtonsoftJson installed
-            _userService.Save();
+            _clientService.Save();
 
             return Ok(userToUpdate);
         }
@@ -82,7 +83,7 @@ namespace DAW.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate(UserRequestDTO user)
         {
-            var response = _userService.Authenticate(user);
+            var response = _clientService.Authenticate(user);
 
             if (response == null)
             {
@@ -96,13 +97,13 @@ namespace DAW.Controllers
         public IActionResult DeleteUser([FromRoute] string id)
         {
             Guid guidId = new Guid(id);
-            Client userToDelete = _userService.FindById(guidId);
+            Client userToDelete = _clientService.FindById(guidId);
             if (userToDelete == null)
             {
                 return NotFound();
             }
-            _userService.deleteUser(userToDelete);
-            _userService.Save();
+            _clientService.deleteUser(userToDelete);
+            _clientService.Save();
 
 
 

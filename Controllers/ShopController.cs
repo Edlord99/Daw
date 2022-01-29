@@ -1,4 +1,5 @@
 ﻿using DAW.Models._1_M;
+using DAW.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace DAW.Controllers
         [HttpPost]
         public IActionResult AddWithFromBody(Shop shop)
         {
-            var result = _shopService.createBucatarie(shop);
+            var result = _shopService.createShop(shop);
             return Ok(result);
         }
 
